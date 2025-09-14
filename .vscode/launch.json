@@ -2,14 +2,22 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Frontend: Attach to Chrome",
+      "name": "Debug Standlone Vue Frontend",
+      "request": "launch",
+      "type": "chrome",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/frontend",
+      "preLaunchTask": "frontend: dev",
+    },
+    {
+      "name": "[Paritial] Frontend: Attach to Chrome",
       "port": 9222,
       "request": "attach",
       "type": "chrome",
       "webRoot": "${workspaceFolder}/frontend"
     },
     {
-      "name": "Backend: Run Python",
+      "name": "[Paritial] Backend: Run Python",
       "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/main.py",
@@ -20,7 +28,10 @@
         "PYTHONPATH": "${workspaceFolder}",
         "DEV_MODE": "1",
         "CONDA_DEFAULT_ENV": "${env:CONDA_DEFAULT_ENV}",
-        "PATH": "${env:PATH}"
+        "PATH": "${env:PATH}",
+        //remote-allow-origins too bad here?
+        "WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS": " --remote-debugging-port=9222 --remote-allow-origins=*",
+        "WEBVIEW2_USER_DATA_FOLDER": "cache_dir"
       },
       "envFile": "${workspaceFolder}/.env",
       "cwd": "${workspaceFolder}",
@@ -32,8 +43,8 @@
     {
       "name": "🎯 Full Stack Debug",
       "configurations": [
-        "Frontend: Attach to Chrome",
-        "Backend: Run Python"
+        "[Paritial] Frontend: Attach to Chrome",
+        "[Paritial] Backend: Run Python"
       ],
       "stopAll": true
     }

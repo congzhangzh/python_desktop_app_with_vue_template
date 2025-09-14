@@ -71,7 +71,7 @@ const resultsContainer = ref<HTMLElement>()
 let backend: BackendInterface
 
 // Context information
-const context = ref(getContext())
+const context = ref("")
 
 // Computed properties
 const sceneBadgeClass = computed(() => ({ on: true }))
@@ -93,6 +93,7 @@ const log = (message: string, type: 'info' | 'success' | 'error' = 'info') => {
 const initBackend = () => {
   try {
     backend = createBackend()
+    context.value = backend.context
     log(`Backend initialized: ${context.value}`, 'success')
   } catch (error) {
     log(`Failed to initialize backend: ${error}`, 'error')

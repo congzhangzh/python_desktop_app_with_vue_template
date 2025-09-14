@@ -6,6 +6,18 @@
 2. 这时脚手架，后端保持简单: 内容简单，结构完整
 3. 这是脚手架，配套保持简单
 4. 这是脚手架，发布过程简单，不用非single file
+5. 不要用yarn，原生态最好
+
+### 关于各种环境
+
+1. 安装micromamba
+2. 使用micromamba安装python和nodejs
+3. 安装所有依赖
+4. 在vs code切换解释器为micromamba的python为活动解释器
+5. 在launch.json中应用活动解释器
+
+#### 关于windows shell
+优选cmd.exe, 除非必须用powershell
 
 ## 目标
 设计一个脚手架演示能力和方法，用于第三方项目开发的基础
@@ -33,6 +45,20 @@
 4. 创建主python模块并验证
 5. 配置调试并验证
 6. 创建发布脚本并验证
+
+```bash
+# ref https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html
+# restart powershell after install
+Invoke-Expression ((Invoke-WebRequest -Uri https://micro.mamba.pm/install.ps1 -UseBasicParsing).Content)
+
+# do if needed:  micromamba shell init --shell cmd.exe --root-prefix=~/.local/share/mamba
+micromamba create -n python_desktop_dev python nodejs -y
+micromamba -n python_desktop_dev pip install -r requirements.txt
+
+# fight to the world now
+# active: micromamba activate python_desktop_dev
+# or run under context: micromamba -n  python_desktop_dev your command
+```
 ## 细节
 ### 前端--TBD
 ### 后端--TBD
