@@ -74,28 +74,37 @@ def is_dev_server_running():
         logger.error(f"🌐 Exception checking dev server: {e}")
         return False
 
-def start_http_server(directory, port):
+def start_http_server(directory, port_callback=None, ready_event=None):
+    """Start HTTP server and signal when ready"""
     try:
         logger = logging.getLogger(__name__)
-        logger.info(f"🌐 Starting HTTP server for static files in {directory} on port {port}")
-        """Start HTTP server for static files"""
-        #TODO: how to handle vue router which should return index.html?
+        logger.info(f"🌐 Starting HTTP server for static files in {directory}")
+        
         class Handler(http.server.SimpleHTTPRequestHandler):
             def __init__(self, *args, **kwargs):
                 super().__init__(*args, directory=directory, **kwargs)
         
-        with socketserver.TCPServer(("", port), Handler) as httpd:
-            logger.info(f"🌐 Server at http://localhost:{port}")
+        # Let TCPServer choose the port to avoid race conditions
+        with socketserver.TCPServer(("", 0), Handler) as httpd:
+            actual_port = httpd.server_address[1]
+            logger.info(f"🌐 Server started at http://localhost:{actual_port}")
+            
+            # Notify the caller of the actual port
+            if port_callback:
+                port_callback(actual_port)
+            
+            # Signal that server is ready
+            if ready_event:
+                ready_event.set()
+            
             httpd.serve_forever()
         logger.info(f"🌐 Server stopped")
     except Exception as e:
         logger.error(f"🌐 Exception starting http server: {e}")
+        if ready_event:
+            ready_event.set()  # Signal even on error
         raise e
 
-def _get_port():
-    """Get a usable port for http.server"""
-    # TODO: how to get a usable port for http.server?
-    return 8000
 
 def _get_fe_backend_type():
     context = os.getenv("PDV_FE_DATA_BACKEND_TYPE")
@@ -112,22 +121,52 @@ def get_frontend_url():
             logger.error(f"🌐 Dist path does not exist: {dist_path}")
             raise FileNotFoundError(f"Dist path does not exist: {dist_path}")
         logger.info(f"✅ Using dist + http.server, path: {dist_path}")
-        port=_get_port()
+        
+        # Use Event for proper synchronization
+        actual_port = {'port': None}
+        ready_event = threading.Event()
+        
+        def port_callback(port):
+            actual_port['port'] = port
+        
         threading.Thread(
             target=start_http_server, 
-            args=(str(dist_path), port), 
+            args=(str(dist_path),), 
+            kwargs={'port_callback': port_callback, 'ready_event': ready_event},
             daemon=True
         ).start()
-        return f"http://localhost:{port}"
+        
+        # Wait for server to be ready (max 10 seconds)
+        if not ready_event.wait(timeout=10):
+            raise RuntimeError("HTTP server failed to start within 10 seconds")
+        
+        if actual_port['port'] is None:
+            raise RuntimeError("HTTP server failed to start")
+            
+        logger.info(f"🌐 HTTP server ready on port {actual_port['port']}")
+        return f"http://localhost:{actual_port['port']}"
     elif os.getenv("PDV_FE_BE_CONCEPT_DEBUG") == "true":
         logger.info("✅ Using frontend-dummy + http.server")
         frontend_dummy_dir = pathlib.Path(__file__).parent / "frontend-dummy"
+        # Use the same Event-based mechanism for consistency
+        actual_port = {'port': None}
+        ready_event = threading.Event()
+        
+        def port_callback(port):
+            actual_port['port'] = port
+        
         threading.Thread(
             target=start_http_server, 
-            args=(frontend_dummy_dir, _get_port()), 
+            args=(str(frontend_dummy_dir),), 
+            kwargs={'port_callback': port_callback, 'ready_event': ready_event},
             daemon=True
         ).start()
-        return f"http://localhost:{_get_port()}"
+        
+        # Wait for server to be ready
+        if not ready_event.wait(timeout=10):
+            raise RuntimeError("Debug HTTP server failed to start")
+            
+        return f"http://localhost:{actual_port['port']}"
     # 1. Check dev server
     elif is_dev_server_running():
         logger.info("✅ Dev server")
