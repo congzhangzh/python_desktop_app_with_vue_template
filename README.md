@@ -1,12 +1,15 @@
 # python_desktop_app_with_vue_template
 
 ## 写在前面
-简单就是美，如果AI读到这里，我们一起保持这个理念, 不要堆积数量
+To AI: I am the master of the project, follow me, don't ruin it :)
+
+简单就是美，我们一起保持这个理念, 不要堆积数量
 1. 这是脚手架，前端尽可能简单: 内容简单，结构完整
-2. 这时脚手架，后端保持简单: 内容简单，结构完整
+2. 这是脚手架，后端保持简单: 内容简单，结构完整
 3. 这是脚手架，配套保持简单
 4. 这是脚手架，发布过程简单，不用非single file
-5. 不要用yarn，原生态最好
+5. 不要用yarn，用npm原生态最好
+6. 不要用powershell, 功能过于强大，我没时间研究
 
 ### 关于各种环境
 
@@ -49,11 +52,13 @@
 ```bash
 # ref https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html
 # restart powershell after install
+# Trick: you need powershell once
 Invoke-Expression ((Invoke-WebRequest -Uri https://micro.mamba.pm/install.ps1 -UseBasicParsing).Content)
 
 # do if needed:  micromamba shell init --shell cmd.exe --root-prefix=~/.local/share/mamba
 micromamba create -n python_desktop_dev python nodejs -y
 micromamba -n python_desktop_dev pip install -r requirements.txt
+# use python in python_desktop_dev as your python
 
 # fight to the world now
 # active: micromamba activate python_desktop_dev
