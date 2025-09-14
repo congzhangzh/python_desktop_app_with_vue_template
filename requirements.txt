@@ -1,0 +1,18 @@
+# Unified requirements for all versions
+# Qt4 version (manual install required)
+# PyQt4  # Install manually: sudo apt-get install python-qt4-dev
+
+# WebView version (main.py now uses this)
+webview_python
+
+# WebUI version
+webui2
+
+# Common utilities
+requests
+
+# Alternative Qt version (if needed)
+PySide6
+
+# Build tool
+PyInstaller
