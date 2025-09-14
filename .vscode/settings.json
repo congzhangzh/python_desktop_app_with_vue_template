@@ -1,15 +1,16 @@
 {
   // 完全动态配置 - 通过.env文件和脚本自动检测
-  "python.defaultInterpreterPath": "${env:PYTHON_INTERPRETER_PATH}",
+  // "python.defaultInterpreterPath": "${env:PYTHON_INTERPRETER_PATH}",
+  "python.defaultInterpreterPath": "${command:python.interpreterPath}",
   "python.terminal.activateEnvironment": true,
   "python.terminal.activateEnvInCurrentTerminal": true,
   
   // 动态检测conda/mamba
-  "python.condaPath": "${env:CONDA_CMD}",
-  "python.venvPath": "${env:CONDA_ENVS_PATH}",
+  // "python.condaPath": "${env:CONDA_CMD}",
+  // "python.venvPath": "${env:CONDA_ENVS_PATH}",
   
   // 支持.env文件
-  "python.envFile": "${workspaceFolder}/.env",
+  // "python.envFile": "${workspaceFolder}/.env",
   "files.exclude": {
     "**/node_modules": true,
     "**/dist": true,
@@ -35,16 +36,17 @@
   "python.linting.flake8Enabled": true,
   "python.formatting.provider": "black",
   "python.analysis.typeCheckingMode": "basic",
-  "terminal.integrated.env.linux": {
-    "MAMBA_EXE": "~/mambaforge/bin/mamba",
-    "CONDA_EXE": "~/mambaforge/bin/conda"
-  },
-  "terminal.integrated.env.osx": {
-    "MAMBA_EXE": "~/mambaforge/bin/mamba",
-    "CONDA_EXE": "~/mambaforge/bin/conda"
-  },
+  // "terminal.integrated.env.linux": {
+  //   "MAMBA_EXE": "~/mambaforge/bin/mamba",
+  //   "CONDA_EXE": "~/mambaforge/bin/conda"
+  // },
+  // "terminal.integrated.env.osx": {
+  //   "MAMBA_EXE": "~/mambaforge/bin/mamba",
+  //   "CONDA_EXE": "~/mambaforge/bin/conda"
+  // },
   "workbench.colorCustomizations": {
     "terminal.background": "#1e1e1e",
     "terminal.foreground": "#d4d4d4"
-  }
+  },
+  // "cursorpyright.analysis.typeCheckingMode": "basic"
 }
