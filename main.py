@@ -34,8 +34,8 @@ def _get_port():
     # TODO: how to get a usable port for http.server?
     return 8000
 
-def _get_data_backend_type():
-    context = os.getenv("PDV_DATA_BACKEND_TYPE")
+def _get_fe_backend_type():
+    context = os.getenv("PDV_FE_DATA_BACKEND_TYPE")
     return context if context else "mock"
 
 def get_frontend_url():
@@ -89,11 +89,11 @@ def main(webview_type='webview_python'):
         
         # Core business logic (all in one place, easy to modify)
         frontend_url = get_frontend_url()
-        data_backend_type = _get_data_backend_type()
+        fe_backend_type = _get_fe_backend_type()
         add_business_features(webview)
         
         # Run app
-        webview.navigate(rf'{frontend_url}#backend_type={data_backend_type}')
+        webview.navigate(rf'{frontend_url}#backend_type={fe_backend_type}')
         webview.run()
         
     except ImportError as e:
