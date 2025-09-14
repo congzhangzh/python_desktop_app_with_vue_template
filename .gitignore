@@ -1,3 +1,11 @@
+# Locking file
+package-lock.json
+
+# Pyinstaller build files
+dist/ec
+build/
+*.spec
+
 # Logs
 logs
 *.log
