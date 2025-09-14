@@ -114,7 +114,9 @@ def main(webview_type='webview_python'):
 
 if __name__ == "__main__":
     import sys
-    
+    # import os
+    # os.environ["WEBVIEW2_USER_DATA_FOLDER"]="your_cache_dir"
+    # os.environ["WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS"]= " --remote-debugging-port=9222 --remote-allow-origins=*"
     # Easy switching: python app.py webview_python|webui|qt4
     webview_type = sys.argv[1] if len(sys.argv) > 1 else 'webview_python'
     main(webview_type)

@@ -1,3 +1,6 @@
+# wip ignore
+cache_dir/
+
 # Locking file
 package-lock.json
 

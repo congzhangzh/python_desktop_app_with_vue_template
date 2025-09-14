@@ -8,13 +8,24 @@
       "url": "http://localhost:5173",
       "webRoot": "${workspaceFolder}/frontend",
       "preLaunchTask": "frontend: dev",
+      // "sourceMapPathOverrides": {
+      //   "webpack:///src/*": "${workspaceFolder}/frontend/src/*",
+      //   "/./*": "${workspaceFolder}/frontend/*",
+      //   "/src/*": "${workspaceFolder}/frontend/src/*"
+      // }
     },
     {
       "name": "[Paritial] Frontend: Attach to Chrome",
       "port": 9222,
       "request": "attach",
       "type": "chrome",
-      "webRoot": "${workspaceFolder}/frontend"
+      "webRoot": "${workspaceFolder}/frontend",
+      "timeout": 10000,
+      // "sourceMapPathOverrides": {
+      //   "webpack:///src/*": "${workspaceFolder}/frontend/src/*",
+      //   "/./*": "${workspaceFolder}/frontend/*",
+      //   "/src/*": "${workspaceFolder}/frontend/src/*"
+      // }
     },
     {
       "name": "[Paritial] Backend: Run Python",
