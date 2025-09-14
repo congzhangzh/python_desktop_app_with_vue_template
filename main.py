@@ -3,41 +3,94 @@
 Main Application - Core business logic in one place
 """
 import os
+import sys
 import pathlib
 import threading
 import http.server
 import socketserver
 import urllib.request
 import urllib.error
+import logging
+import datetime
 from webview_abstraction import create_webview
+import faulthandler
 
+def is_frozen():
+    """Check if the application is frozen"""
+    return getattr(sys, 'frozen', False)
+
+def is_windowed_mode():
+    """更简单的检测方法"""
+    import io
+    # 如果stdout被重定向或不存在，说明是窗口模式
+    return not hasattr(sys.stdout, 'write') or isinstance(sys.stdout, io.StringIO)
+
+if is_windowed_mode():
+    # Or http.server will do nothing, even hold the port but not serve the files and raise no exception
+    sys.stdout = sys.stderr = open('stdout.log', 'w', encoding='utf-8')
+
+if not is_windowed_mode():
+    faulthandler.enable()
+
+def setup_logging():
+    """Setup logging for both development and frozen environment"""
+    if is_frozen():
+        # In frozen app, log to file next to exe
+        log_dir = os.path.dirname(sys.executable)
+        log_file = os.path.join(log_dir, "app.log")
+    else:
+        # In development, log to project directory
+        log_dir = os.path.dirname(os.path.abspath(__file__))
+        log_file = os.path.join(log_dir, "app.log")
+    
+    # Configure logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(log_file, encoding='utf-8'),
+            logging.StreamHandler(sys.stdout)  # Still show in console for development
+        ]
+    )
+    
+    logger = logging.getLogger(__name__)
+    logger.info(f"🚀 Application started, frozen: {is_frozen()}")
+    logger.info(f"📝 Log file: {log_file}")
+    return logger
 
 def is_dev_server_running():
     """Check if dev server is running"""
+    logger = logging.getLogger(__name__)
     try:
         # Try to make HTTP request to dev server
         response = urllib.request.urlopen('http://localhost:5173', timeout=3)
         is_running = response.status == 200
-        print(f"🌐 Dev server is running: {is_running}, status: {response.status}")
+        logger.info(f"🌐 Dev server is running: {is_running}, status: {response.status}")
         return is_running
     except urllib.error.URLError as e:
-        print(f"🌐 Dev server is not running: {e}")
+        logger.info(f"🌐 Dev server is not running: {e}")
         return False
     except Exception as e:
-        print(f"🌐 Exception checking dev server: {e}")
+        logger.error(f"🌐 Exception checking dev server: {e}")
         return False
 
-
-def start_http_server(directory, port=8000):
-    """Start HTTP server for static files"""
-    #TODO: how to handle vue router which should return index.html?
-    class Handler(http.server.SimpleHTTPRequestHandler):
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, directory=directory, **kwargs)
-    
-    with socketserver.TCPServer(("", port), Handler) as httpd:
-        print(f"🌐 Server at http://localhost:{port}")
-        httpd.serve_forever()
+def start_http_server(directory, port):
+    try:
+        logger = logging.getLogger(__name__)
+        logger.info(f"🌐 Starting HTTP server for static files in {directory} on port {port}")
+        """Start HTTP server for static files"""
+        #TODO: how to handle vue router which should return index.html?
+        class Handler(http.server.SimpleHTTPRequestHandler):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, directory=directory, **kwargs)
+        
+        with socketserver.TCPServer(("", port), Handler) as httpd:
+            logger.info(f"🌐 Server at http://localhost:{port}")
+            httpd.serve_forever()
+        logger.info(f"🌐 Server stopped")
+    except Exception as e:
+        logger.error(f"🌐 Exception starting http server: {e}")
+        raise e
 
 def _get_port():
     """Get a usable port for http.server"""
@@ -50,35 +103,40 @@ def _get_fe_backend_type():
 
 def get_frontend_url():
     """Get frontend URL - core business logic here"""
-    if os.getenv("PDV_FE_BE_CONCEPT_DEBUG") == "true":
-        print("✅ Using frontend-dummy + http.server")
+    logger = logging.getLogger(__name__)
+    
+    if is_frozen():
+        logger.info(f"🌐 Running as frozen app, sys.executable: {sys.executable}")
+        dist_path = pathlib.Path(sys.executable).parent /"_internal"/"frontend" / "dist"
+        if not dist_path.exists():
+            logger.error(f"🌐 Dist path does not exist: {dist_path}")
+            raise FileNotFoundError(f"Dist path does not exist: {dist_path}")
+        logger.info(f"✅ Using dist + http.server, path: {dist_path}")
+        port=_get_port()
+        threading.Thread(
+            target=start_http_server, 
+            args=(str(dist_path), port), 
+            daemon=True
+        ).start()
+        return f"http://localhost:{port}"
+    elif os.getenv("PDV_FE_BE_CONCEPT_DEBUG") == "true":
+        logger.info("✅ Using frontend-dummy + http.server")
         frontend_dummy_dir = pathlib.Path(__file__).parent / "frontend-dummy"
         threading.Thread(
             target=start_http_server, 
             args=(frontend_dummy_dir, _get_port()), 
             daemon=True
         ).start()
-        return "http://localhost:8000"
+        return f"http://localhost:{_get_port()}"
     # 1. Check dev server
-    if is_dev_server_running():
-        print("✅ Dev server")
+    elif is_dev_server_running():
+        logger.info("✅ Dev server")
         return "http://localhost:5173"
     
-    # 2. Check dist folder
-    if os.path.exists("frontend/dist"):
-        print("✅ Using dist + http.server")
-        threading.Thread(
-            target=start_http_server, 
-            args=("frontend/dist", _get_port()), 
-            daemon=True
-        ).start()
-        return "http://localhost:8000"
-    
     # 3. Fallback
-    print("⚠️ No frontend")
+    logger.warning("⚠️ No frontend")
     return ("data:text/html,<h1>Vue Desktop App</h1><p>No Vue frontend found</p>"
             "<p>Run: npm run dev</p>")
-
 
 def add_business_features(webview):
     """Add your business features here"""
@@ -90,7 +148,9 @@ def add_business_features(webview):
 
 def main(webview_type='webview_python'):
     """Main application entry point"""
-    print(f"🚀 Starting Vue Desktop App with {webview_type}...")
+    # Setup logging first
+    logger = setup_logging()
+    logger.info(f"🚀 Starting Vue Desktop App with {webview_type}...")
     
     try:
         # Create webview (only this part is abstracted)
@@ -100,6 +160,8 @@ def main(webview_type='webview_python'):
         # Core business logic (all in one place, easy to modify)
         frontend_url = get_frontend_url()
         fe_backend_type = _get_fe_backend_type()
+        logger.info(f"🌐 Frontend URL: {frontend_url}")
+        logger.info(f"🔧 Backend type: {fe_backend_type}")
         add_business_features(webview)
         
         # Run app
@@ -107,9 +169,11 @@ def main(webview_type='webview_python'):
         webview.run()
         
     except ImportError as e:
-        print(f"❌ Failed to create {webview_type}: {e}")
+        logger.error(f"❌ Failed to create {webview_type}: {e}")
+        raise e
     except Exception as e:
-        print(f"❌ Error: {e}")
+        logger.error(f"❌ Error: {e}")
+        raise e
 
 
 if __name__ == "__main__":

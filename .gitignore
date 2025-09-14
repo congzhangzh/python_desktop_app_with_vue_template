@@ -1,5 +1,7 @@
 # wip ignore
 cache_dir/
+app.log*
+__pycache__
 
 # Locking file
 package-lock.json
