@@ -1,0 +1,16 @@
+name: desktop_app_by_webview
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.13
+  - pip
+  - pip:
+    - -r requirements.txt
+
+# VS Code Python environment auto-discovery
+# This file helps VS Code automatically detect the conda environment
+# Team members should create this environment using:
+# mamba env create -f environment.yml
+# or
+# conda env create -f environment.yml

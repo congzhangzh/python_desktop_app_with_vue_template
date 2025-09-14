@@ -133,6 +133,25 @@ dist
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
+# VS Code personal settings (keep team shared configs)
+!.vscode/settings.json
+!.vscode/settings.example.json
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/README.md
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
 # yarn v3
 .pnp.*
 .yarn/*

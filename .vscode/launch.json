@@ -1,0 +1,41 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Frontend: Attach to Chrome",
+      "port": 9222,
+      "request": "attach",
+      "type": "chrome",
+      "webRoot": "${workspaceFolder}/frontend"
+    },
+    {
+      "name": "Backend: Run Python",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "console": "integratedTerminal",
+      "preLaunchTask": "frontend: dev",
+      "python": "${env:PYTHON_INTERPRETER_PATH}",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}",
+        "DEV_MODE": "1",
+        "CONDA_DEFAULT_ENV": "${env:CONDA_DEFAULT_ENV}",
+        "PATH": "${env:PATH}"
+      },
+      "envFile": "${workspaceFolder}/.env",
+      "cwd": "${workspaceFolder}",
+      "stopOnEntry": false,
+      "args": []
+    }
+  ],
+  "compounds": [
+    {
+      "name": "🎯 Full Stack Debug",
+      "configurations": [
+        "Frontend: Attach to Chrome",
+        "Backend: Run Python"
+      ],
+      "stopAll": true
+    }
+  ]
+}
