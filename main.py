@@ -3,20 +3,29 @@
 Main Application - Core business logic in one place
 """
 import os
-import socket
 import pathlib
 import threading
 import http.server
 import socketserver
+import urllib.request
+import urllib.error
 from webview_abstraction import create_webview
 
 
 def is_dev_server_running():
     """Check if dev server is running"""
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    result = sock.connect_ex(('localhost', 5173))
-    sock.close()
-    return result == 0
+    try:
+        # Try to make HTTP request to dev server
+        response = urllib.request.urlopen('http://localhost:5173', timeout=3)
+        is_running = response.status == 200
+        print(f"🌐 Dev server is running: {is_running}, status: {response.status}")
+        return is_running
+    except urllib.error.URLError as e:
+        print(f"🌐 Dev server is not running: {e}")
+        return False
+    except Exception as e:
+        print(f"🌐 Exception checking dev server: {e}")
+        return False
 
 
 def start_http_server(directory, port=8000):

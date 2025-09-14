@@ -23,11 +23,11 @@
       "program": "${workspaceFolder}/main.py",
       "console": "integratedTerminal",
       "preLaunchTask": "frontend: dev",
-      "python": "${env:PYTHON_INTERPRETER_PATH}",
+      "python": "${command:python.interpreterPath}",
       "env": {
-        "PYTHONPATH": "${workspaceFolder}",
-        "DEV_MODE": "1",
-        "CONDA_DEFAULT_ENV": "${env:CONDA_DEFAULT_ENV}",
+        // "PYTHONPATH": "${workspaceFolder}",
+        // "DEV_MODE": "1",
+        // "CONDA_DEFAULT_ENV": "${env:CONDA_DEFAULT_ENV}",
         "PATH": "${env:PATH}",
         //remote-allow-origins too bad here?
         "WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS": " --remote-debugging-port=9222 --remote-allow-origins=*",
