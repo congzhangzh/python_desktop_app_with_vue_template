@@ -21,6 +21,7 @@ def is_dev_server_running():
 
 def start_http_server(directory, port=8000):
     """Start HTTP server for static files"""
+    #TODO: how to handle vue router which should return index.html?
     class Handler(http.server.SimpleHTTPRequestHandler):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, directory=directory, **kwargs)
