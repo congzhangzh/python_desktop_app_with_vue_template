@@ -82,8 +82,9 @@ PDV_FE_DATA_BACKEND_TYPE=mock # 使用mock数据而不是真实后端
 1. 使用qt 4 python的asyncio集成还是, congzhangzh/webview_python?
 
 ## 参考
-1. https://nodejs.org/en/download/current
-2. https://vuejs.uz/guide/quick-start.html#next-steps
-3. https://v2.vuejs.org/v2/cookbook/debugging-in-vscode.html
-4. https://www.electronjs.org/docs/latest/tutorial/debugging-vscode
-5. https://code.visualstudio.com/docs/debugtest/debugging-configuration
+1. https://github.com/congzhangzh/webview_python
+2. https://nodejs.org/en/download/current
+3. https://vuejs.uz/guide/quick-start.html#next-steps
+4. https://v2.vuejs.org/v2/cookbook/debugging-in-vscode.html
+5. https://www.electronjs.org/docs/latest/tutorial/debugging-vscode
+6. https://code.visualstudio.com/docs/debugtest/debugging-configuration
