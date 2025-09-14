@@ -4,6 +4,7 @@ Main Application - Core business logic in one place
 """
 import os
 import socket
+import pathlib
 import threading
 import http.server
 import socketserver
@@ -28,9 +29,26 @@ def start_http_server(directory, port=8000):
         print(f"🌐 Server at http://localhost:{port}")
         httpd.serve_forever()
 
+def _get_port():
+    """Get a usable port for http.server"""
+    # TODO: how to get a usable port for http.server?
+    return 8000
+
+def _get_data_backend_type():
+    context = os.getenv("PDV_DATA_BACKEND_TYPE")
+    return context if context else "mock"
 
 def get_frontend_url():
     """Get frontend URL - core business logic here"""
+    if os.getenv("PDV_FE_BE_CONCEPT_DEBUG") == "true":
+        print("✅ Using frontend-dummy + http.server")
+        frontend_dummy_dir = pathlib.Path(__file__).parent / "frontend-dummy"
+        threading.Thread(
+            target=start_http_server, 
+            args=(frontend_dummy_dir, _get_port()), 
+            daemon=True
+        ).start()
+        return "http://localhost:8000"
     # 1. Check dev server
     if is_dev_server_running():
         print("✅ Dev server")
@@ -39,18 +57,23 @@ def get_frontend_url():
     # 2. Check dist folder
     if os.path.exists("frontend/dist"):
         print("✅ Using dist + http.server")
-        threading.Thread(target=start_http_server, args=("frontend/dist", 8000), daemon=True).start()
+        threading.Thread(
+            target=start_http_server, 
+            args=("frontend/dist", _get_port()), 
+            daemon=True
+        ).start()
         return "http://localhost:8000"
     
     # 3. Fallback
     print("⚠️ No frontend")
-    return "data:text/html,<h1>Vue Desktop App</h1><p>No Vue frontend found</p><p>Run: npm run dev</p>"
+    return ("data:text/html,<h1>Vue Desktop App</h1><p>No Vue frontend found</p>"
+            "<p>Run: npm run dev</p>")
 
 
 def add_business_features(webview):
     """Add your business features here"""
     # TODO: Add API bindings
-    # TODO: Add database connections  
+    # TODO: Add database connections
     # TODO: Add business logic handlers
     pass
 
@@ -66,10 +89,11 @@ def main(webview_type='webview_python'):
         
         # Core business logic (all in one place, easy to modify)
         frontend_url = get_frontend_url()
+        data_backend_type = _get_data_backend_type()
         add_business_features(webview)
         
         # Run app
-        webview.navigate(frontend_url)
+        webview.navigate(rf'{frontend_url}#backend_type={data_backend_type}')
         webview.run()
         
     except ImportError as e:

@@ -38,6 +38,12 @@
 ### 后端--TBD
 ### 前后端联合调试--TBD
 ### 发布--TBD
+## 关键控制点
+```bash
+PDV_FE_BE_CONCEPT_DEBUG=true # 使用dummy网页而不是真实产品
+#mock,qt,webui,webview
+PDV_FE_DATA_BACKEND_TYPE=mock # 使用mock数据而不是真实后端
+```
 ## 未决定事项
 1. 使用qt 4 python的asyncio集成还是, congzhangzh/webview_python?
 ## 参考
