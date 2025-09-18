@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed, nextTick } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed, nextTick } from 'vue'
 import { 
   createBackend, 
   type BackendInterface 
@@ -98,6 +98,12 @@ const initBackend = () => {
   } catch (error) {
     log(`Failed to initialize backend: ${error}`, 'error')
   }
+}
+
+// Handle hash change for backend switching
+const handleHashChange = () => {
+  log('Hash changed, reinitializing backend...', 'info')
+  initBackend()
 }
 
 // API test methods
@@ -147,6 +153,15 @@ onMounted(() => {
   initBackend()
   log('Vue Backend Test View loaded', 'info')
   log(`Context: ${context.value}`, 'info')
+  
+  // Add hash change listener for backend switching
+  // TODO hashchange is better way? as it's needed by vue?
+  window.addEventListener('hashchange', handleHashChange)
+})
+
+onUnmounted(() => {
+  // Clean up event listener
+  window.removeEventListener('hashchange', handleHashChange)
 })
 </script>
 

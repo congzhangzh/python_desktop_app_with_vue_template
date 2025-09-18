@@ -6,6 +6,7 @@
 // Context information from backend
 const getContext = (): string => {
   // Check URL hash for backend_type (e.g., #backend_type=webview)
+  // TODO query string is a better way?
   const hash = window.location.hash
   const hashMatch = hash.match(/backend_type=(\w+)/)
   return hashMatch ? hashMatch[1] : 'mock'
